@@ -19,7 +19,7 @@ env:
   GITHUB_OWNER: ${{ github.repository_owner }}
   CI_PROJECT_NAME: ${{ github.repository }}
 
-  jobs:
+jobs:
   configure_env_vars:
     container:
       image: quay.io/pantheon-public/build-tools-ci:6.x
