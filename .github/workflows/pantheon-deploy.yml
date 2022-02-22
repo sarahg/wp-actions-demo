@@ -10,6 +10,7 @@ env:
   GITHUB_TOKEN: ${{ github.token }}
   TERMINUS_TOKEN: ${{ secrets.TERMINUS_TOKEN }}
   TEST_SITE_NAME: ${{ secrets.TERMINUS_SITE }}
+  PANTHEON_GIT_URL: ${{ secrets.PANTHEON_GIT_URL }}
   BASH_ENV: "./bash_env.txt"
   CI_BRANCH: ${{ github.ref }}
   COMMIT_SHA: ${{ github.sha }}
@@ -69,13 +70,31 @@ jobs:
           echo "export CI_REPOSITORY_URL='https://github.com/${GITHUB_REPOSITORY}'" >> $BASH_ENV
           echo "export ARTIFACTS_DIR_URL='${GITHUB_WORKFLOW_URL}/#artifacts'" >> $BASH_ENV
 
-  deploy_to_pantheon:
+  build_wordpress_theme:
     container:
       image: quay.io/pantheon-public/build-tools-ci:6.x
       options: --user root
     runs-on: ubuntu-latest
     needs: [configure_env_vars]
     steps:
+      - name: Clone Pantheon repo
+        run: |
+          git clone ${PANTHEON_GIT_URL}
+          rm -rf wp-content/themes/${CI_PROJECT_NAME}
+
+      - name: Update theme
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          path: wp-content/themes
+
+  deploy_to_pantheon:
+    container:
+      image: quay.io/pantheon-public/build-tools-ci:6.x
+      options: --user root
+    runs-on: ubuntu-latest
+    needs: [build_wordpress_theme, configure_env_vars]
+
       - name: Checkout
         uses: actions/checkout@v2
         with:
@@ -98,9 +117,9 @@ jobs:
       - name: setup-environment-vars
         run: /build-tools-ci/scripts/set-environment
 
-      # Rsync the build artifact pieces web directory
+      # Rsync the build artifact
       - name: sync build artifact
-        run: rsync -rz ./web ./vendor .
+        run: rsync -rz .
 
       # Deploy to Pantheon
       - name: deploy to Pantheon
