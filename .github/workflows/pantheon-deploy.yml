@@ -78,12 +78,11 @@ jobs:
     needs: [configure_env_vars]
     steps:
       - name: Clone Pantheon repo
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: $SSH_PRIVATE_KEY}
         run: |
-          echo "$SSH_PRIVATE_KEY" > ../private.key
-          chmod 600 ../private.key
-          eval `ssh-agent -s`
-          ssh-add ../private.key
-          git clone ${PANTHEON_GIT_URL}
+          git clone ${PANTHEON_REPO} .
           rm -rf wp-content/themes/${CI_PROJECT_NAME}
 
       - name: Update theme
@@ -127,10 +126,8 @@ jobs:
 
       # Deploy to Pantheon
       - name: deploy to Pantheon
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: $SSH_PRIVATE_KEY}
         run: |
-          echo "$SSH_PRIVATE_KEY" > ../private.key
-          chmod 600 ../private.key
-          eval `ssh-agent -s`
-          ssh-add ../private.key
-          source $BASH_ENV
           ./.ci/deploy/pantheon/dev-multidev
