@@ -78,9 +78,9 @@ jobs:
     needs: [configure_env_vars]
     steps:
       - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.5.4
+        uses: shimataro/ssh-key-action@v2
         with:
-          ssh-private-key: ${SSH_PRIVATE_KEY}
+          key: ${SSH_PRIVATE_KEY}
 
       - name: Clone Pantheon repo
         run: |
@@ -128,9 +128,9 @@ jobs:
 
       # Deploy to Pantheon
       - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.5.4
+        uses: shimataro/ssh-key-action@v2
         with:
-          ssh-private-key: $SSH_PRIVATE_KEY}
+          key: ${SSH_PRIVATE_KEY}
 
       - name: Deploy to Pantheon
         run: |
