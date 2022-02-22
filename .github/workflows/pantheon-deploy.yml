@@ -87,7 +87,7 @@ jobs:
           known_hosts: ${SSH_KNOWN_HOSTS}
       - name: Clone Pantheon repo
         run: |
-          git clone ${PANTHEON_REPO} .
+          git clone ${PANTHEON_GIT_URL} .
           rm -rf wp-content/themes/${CI_PROJECT_NAME}
 
       - name: Update theme
