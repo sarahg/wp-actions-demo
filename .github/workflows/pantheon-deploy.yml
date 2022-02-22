@@ -17,6 +17,8 @@ env:
   CI_BUILD_NUMBER: ${{ github.run_number }}
   DEFAULT_SITE: ${{ secrets.TERMINUS_SITE }}
   SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+  SSH_CONFIG: ${{ secrets.SSH_CONFIG }}
+  SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
   GITHUB_OWNER: ${{ github.repository_owner }}
   CI_PROJECT_NAME: ${{ github.repository }}
 
@@ -81,7 +83,8 @@ jobs:
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${SSH_PRIVATE_KEY}
-
+          config: ${SSH_CONFIG}
+          known_hosts: ${SSH_KNOWN_HOSTS}
       - name: Clone Pantheon repo
         run: |
           git clone ${PANTHEON_REPO} .
@@ -131,6 +134,8 @@ jobs:
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${SSH_PRIVATE_KEY}
+          config: ${SSH_CONFIG}
+          known_hosts: ${SSH_KNOWN_HOSTS}
 
       - name: Deploy to Pantheon
         run: |
