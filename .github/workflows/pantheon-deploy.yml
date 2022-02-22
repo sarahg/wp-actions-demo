@@ -79,6 +79,11 @@ jobs:
     steps:
       - name: Clone Pantheon repo
         run: |
+          echo "$SSH_PRIVATE_KEY" > ../private.key
+          chmod 600 ../private.key
+          eval `ssh-agent -s`
+          ssh-add ../private.key
+          source $BASH_ENV
           git clone ${PANTHEON_GIT_URL}
           rm -rf wp-content/themes/${CI_PROJECT_NAME}
 
