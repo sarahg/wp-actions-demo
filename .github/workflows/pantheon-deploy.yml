@@ -77,13 +77,10 @@ jobs:
     needs: [configure_env_vars]
     steps:
       - name: Set up SSH
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${SSH_PRIVATE_KEY}
-          known_hosts: unnecessary
-          config: |
-            Host *.drush.in
-              StrictHostKeyChecking no
+        run: |
+          eval $(ssh-agent -s)
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+          mkdir -p $HOME/.ssh && echo "StrictHostKeyChecking no" >> "$HOME/.ssh/config"
       - name: Clone Pantheon repo
         run: |
           git clone ${PANTHEON_GIT_URL} .
@@ -130,14 +127,12 @@ jobs:
 
       # Deploy to Pantheon
       - name: Set up SSH
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${SSH_PRIVATE_KEY}
-          known_hosts: unnecessary
-          config: |
-            Host *.drush.in
-              StrictHostKeyChecking no
-
+        run: |
+          eval $(ssh-agent -s)
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+          mkdir -p $HOME/.ssh && echo "StrictHostKeyChecking no" >> "$HOME/.ssh/config"
+          git config --global user.email "$GITHUB_OWNER"
+          git config --global user.name "GitHub Actions"
       - name: Deploy to Pantheon
         run: |
           ./.ci/deploy/pantheon/dev-multidev
