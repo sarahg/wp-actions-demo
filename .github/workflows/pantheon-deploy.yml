@@ -78,9 +78,12 @@ jobs:
     steps:
       - name: Set up SSH
         run: |
-          eval $(ssh-agent -s)
-          echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
-          mkdir -p $HOME/.ssh && echo "StrictHostKeyChecking no" >> "$HOME/.ssh/config"
+          echo "$SSH_PRIVATE_KEY" > ../private.key
+          chmod 600 ../private.key
+          eval `ssh-agent -s`
+          ssh-add ../private.key
+          source $BASH_ENV
+
       - name: Clone Pantheon repo
         run: |
           git clone ${PANTHEON_GIT_URL} .
