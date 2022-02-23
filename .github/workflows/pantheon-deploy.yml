@@ -89,8 +89,8 @@ jobs:
 
       - name: Clone Pantheon repo
         run: |
-          git clone ${PANTHEON_GIT_URL} .
-          rm -rf wp-content/themes/${CI_PROJECT_NAME}
+          git clone ${PANTHEON_GIT_URL} docroot
+          rm -rf docroot/wp-content/themes/${CI_PROJECT_NAME}
 
       - name: Update theme
         uses: actions/checkout@v2
@@ -129,7 +129,7 @@ jobs:
 
       # Rsync the build artifact
       - name: sync build artifact
-        run: rsync -rz .
+        run: rsync -rz docroot
 
       # Deploy to Pantheon
       - name: Set up SSH
