@@ -9,6 +9,7 @@ env:
   GITHUB_TOKEN: ${{ github.token }}
   TERMINUS_TOKEN: ${{ secrets.TERMINUS_TOKEN }}
   TEST_SITE_NAME: ${{ secrets.TERMINUS_SITE }}
+  SITE_UUID: ${{ secrets.SITE_UUID }}
   PANTHEON_GIT_URL: ${{ secrets.PANTHEON_GIT_URL }}
   BASH_ENV: "./bash_env.txt"
   CI_BRANCH: ${{ github.ref }}
@@ -82,6 +83,9 @@ jobs:
       - name: Set up SSH
         run: |
           echo "$SSH_PRIVATE_KEY" > ../private.key
+          echo -e "Host *.drush.in\n StrictHostKeyChecking no\n UserKnownHostsFile=/dev/null" >> ~/.ssh/config
+          ssh-keyscan codeserver.dev.$SITE_UUID.drush.in >> ~/.ssh/known_hosts
+          ssh-keyscan $SERVER >> ~/.ssh/known_hosts
           chmod 600 ../private.key
           eval `ssh-agent -s`
           ssh-add ../private.key
