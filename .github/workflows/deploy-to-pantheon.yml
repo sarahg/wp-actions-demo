@@ -30,6 +30,8 @@ jobs:
         mv ${{ github.workspace }}/* wordpress/wp-content/themes
         rm -rf wordpress/wp-content/themes/${THEME_NAME}/.git
         cd wordpress
+        git config --global user.email "sarah@sarahgerman.com"
+        git config --global user.name "Sarah German"
         git add .
         git commit . --message="Deploy from GitHub: ${{ github.ref }}"
         git push origin HEAD:master
