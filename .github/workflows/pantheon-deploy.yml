@@ -82,9 +82,10 @@ jobs:
 
       - name: Set up SSH
         run: |
+          ssh -V
           echo "$SSH_PRIVATE_KEY" > ../private.key
-          echo -e "Host *.drush.in\n StrictHostKeyChecking no\n UserKnownHostsFile=/dev/null" >> ~/.ssh/config
           ssh-keyscan codeserver.dev.$SITE_UUID.drush.in >> ~/.ssh/known_hosts
+          cat ~/.ssh/known_hosts
           chmod 600 ../private.key
           eval `ssh-agent -s`
           ssh-add ../private.key
