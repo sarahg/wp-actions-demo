@@ -70,49 +70,18 @@ jobs:
           echo "export CI_REPOSITORY_URL='https://github.com/${GITHUB_REPOSITORY}'" >> $BASH_ENV
           echo "export ARTIFACTS_DIR_URL='${GITHUB_WORKFLOW_URL}/#artifacts'" >> $BASH_ENV
 
-  build_wordpress_theme:
+  deploy_to_pantheon:
     container:
       image: quay.io/pantheon-public/build-tools-ci:6.x
       options: --user root
     runs-on: ubuntu-latest
     needs: [configure_env_vars]
     steps:
-      - name: setup-environment-vars
-        run: /build-tools-ci/scripts/set-environment
-
-      - name: Set up SSH
-        run: |
-          ssh -V
-          echo "$SSH_PRIVATE_KEY" > ../private.key
-          ssh-keyscan codeserver.dev.$SITE_UUID.drush.in >> ~/.ssh/known_hosts
-          cat ~/.ssh/known_hosts
-          chmod 600 ../private.key
-          eval `ssh-agent -s`
-          ssh-add ../private.key
-          source $BASH_ENV
-
-      - name: Clone Pantheon repo
-        run: |
-          git clone ${PANTHEON_GIT_URL} docroot
-          rm -rf docroot/wp-content/themes/${CI_PROJECT_NAME}
-
-      - name: Update theme
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-          path: wp-content/themes
-
-  deploy_to_pantheon:
-    container:
-      image: quay.io/pantheon-public/build-tools-ci:6.x
-      options: --user root
-    runs-on: ubuntu-latest
-    needs: [build_wordpress_theme, configure_env_vars]
-    steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+          path: wp-content/themes
 
       - name: Cache bash_env.txt
         uses: actions/cache@v2
@@ -136,13 +105,6 @@ jobs:
         run: rsync -rz docroot
 
       # Deploy to Pantheon
-      - name: Set up SSH
-        run: |
-          eval $(ssh-agent -s)
-          echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
-          mkdir -p $HOME/.ssh && echo "StrictHostKeyChecking no" >> "$HOME/.ssh/config"
-          git config --global user.email "$GITHUB_OWNER"
-          git config --global user.name "GitHub Actions"
       - name: Deploy to Pantheon
         run: |
           ./.ci/deploy/pantheon/dev-multidev
