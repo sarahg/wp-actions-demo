@@ -25,6 +25,8 @@ jobs:
         ssh-add ~/.ssh/private.key
 
     - name: Build and commit
+      env:
+        PANTHEON_GIT_URL: ${{ secrets.PANTHEON_GIT_URL }}
       run: |
         git clone ${PANTHEON_GIT_URL} docroot
         rm -rf docroot/wp-content/themes/${{ github.repository }}
