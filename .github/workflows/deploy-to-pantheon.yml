@@ -14,7 +14,7 @@ jobs:
         config:
           Host *.drush.in
             StrictHostKeyChecking no
-        known_hosts: unnecessary
+        known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
     - name: deployer
       env:
         pantheon_repo: '${{ secrets.PANTHEON_GIT_URL }}'
