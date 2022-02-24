@@ -97,4 +97,4 @@ jobs:
       # Deploy to Pantheon
       - name: Deploy to Pantheon
         run: |
-          ./wp-content/themes/${CI_PROJECT_NAME}/.ci/deploy/pantheon/dev-multidev
+          ./wp-content/themes/${CI_PROJECT_REPONAME}/.ci/deploy/pantheon/dev-multidev
