@@ -19,6 +19,7 @@ jobs:
         PANTHEON_GIT_URL: ${{ secrets.PANTHEON_GIT_URL }}
         THEME_NAME: ${{ github.event.repository.name }}
       run: |
+        pwd
         mkdir ~/.ssh
         ssh-keyscan -p 2222 codeserver.dev.${PANTHEON_SITE_ID}.drush.in >> ~/.ssh/known_hosts
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/private.key
@@ -26,8 +27,9 @@ jobs:
         eval `ssh-agent -s`
         ssh-add ~/.ssh/private.key
         git clone ${PANTHEON_GIT_URL} wordpress
+        ls -lah
         rm -rf wordpress/wp-content/themes/${THEME_NAME}/*
-        mv theme_dir/* wordpress/wp-content/themes
+        mv /home/runner/work/wp-actions-demo/theme_dir/* wordpress/wp-content/themes
         rm -rf wordpress/wp-content/themes/${THEME_NAME}/.git
         git add .
         git commit . --message="Deploy from GitHub: ${{ github.ref }}"
