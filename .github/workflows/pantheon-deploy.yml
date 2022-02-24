@@ -98,8 +98,6 @@ jobs:
       - name: Prep for deploy
         run: |
           rm -rf wp-content/themes/${CI_PROJECT_REPONAME}/.git
-          rm -rf wp-content/themes/${CI_PROJECT_REPONAME}/.github
-          mv wp-content/themes/${CI_PROJECT_REPONAME}/.ci .
 
       # Deploy to Pantheon
       - name: Deploy to Pantheon
@@ -109,4 +107,4 @@ jobs:
           eval `ssh-agent -s`
           ssh-add ../private.key
           source $BASH_ENV
-          ./.ci/deploy/pantheon/dev-multidev
+          ./wp-content/themes/${CI_PROJECT_REPONAME}/.ci/deploy/pantheon/dev-multidev
