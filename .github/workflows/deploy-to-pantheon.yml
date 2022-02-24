@@ -42,12 +42,12 @@ jobs:
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       run: |
-        cd ../wordpress
         COMMIT_MSG=$(git log -1 --pretty=%B)
+        cd ../wordpress
         rm -rf wp-content/themes/${THEME_NAME}/.git
         git config --global user.email "sarah@sarahgerman.com"
         git config --global user.name "Sarah German"
-        git add .
+        git add */.*
         git commit . --message="Deploy from GitHub: ${COMMIT_MSG}"
         git push origin HEAD:master
 
