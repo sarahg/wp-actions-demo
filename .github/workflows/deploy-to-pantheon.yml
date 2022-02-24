@@ -18,29 +18,41 @@ jobs:
       with:
         path: theme_dir
 
-    - name: Build and deploy
+    - name: Set up SSH
+      env:
+        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       run: |
         cd ..
         mkdir ~/.ssh
         ssh-keyscan -p 2222 codeserver.dev.${PANTHEON_SITE_ID}.drush.in >> ~/.ssh/known_hosts
+        ssh-agent -a $SSH_AUTH_SOCK > /dev/null
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/private.key
         chmod 600 ~/.ssh/private.key
-        eval `ssh-agent -s`
         ssh-add ~/.ssh/private.key
 
     - name: Clone and merge
+      env:
+        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       run: |
-        pwd
         git clone ${PANTHEON_GIT_URL} wordpress
         mv ${{ github.workspace }}/* wordpress/wp-content/themes
         rm -rf wordpress/wp-content/themes/${THEME_NAME}/.git
 
     - name: Deploy
+      env:
+        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       run: |
-        pwd
         cd wordpress
         git config --global user.email "sarah@sarahgerman.com"
         git config --global user.name "Sarah German"
         git add .
         git commit . --message="Deploy from GitHub: ${{ github.ref }}"
         git push origin HEAD:master
+
+    - name: Cleanup
+      if: always()
+      env:
+        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+      run: |
+        ssh-add -D
+        rm -Rf *
