@@ -10,13 +10,14 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v1
       with:
-        path: theme_workdir
+        path: ${{ github.repository.name }}
 
     - name: Build and deploy
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         PANTHEON_SITE_ID: ${{ secrets.SITE_UUID }}
         PANTHEON_GIT_URL: ${{ secrets.PANTHEON_GIT_URL }}
+        THEME_NAME: ${{ github.repository.name }}
       run: |
         mkdir ~/.ssh
         ssh-keyscan -p 2222 codeserver.dev.${PANTHEON_SITE_ID}.drush.in >> ~/.ssh/known_hosts
@@ -25,9 +26,9 @@ jobs:
         eval `ssh-agent -s`
         ssh-add ~/.ssh/private.key
         git clone ${PANTHEON_GIT_URL} docroot
-        rm -rf docroot/wp-content/themes/${{ github.repository }}
-        mv theme_workdir/${{ github.repository }} docroot/wp-content/themes
-        rm -rf docroot/wp-content/themes/${{ github.repository }}/.git
+        rm -rf docroot/wp-content/themes/${THEME_NAME}
+        mv ${THEME_NAME} docroot/wp-content/themes
+        rm -rf docroot/wp-content/themes/${THEME_NAME}/.git
         git add .
         git commit . --message="Deploy from GitHub: ${{ github.ref }}"
         git push origin HEAD:master
