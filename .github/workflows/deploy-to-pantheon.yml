@@ -10,7 +10,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v1
       with:
-        path: ${GITHUB_WORKSPACE}/theme_dir
+        path: theme_dir
 
     - name: Build and deploy
       env:
@@ -19,7 +19,7 @@ jobs:
         PANTHEON_GIT_URL: ${{ secrets.PANTHEON_GIT_URL }}
         THEME_NAME: ${{ github.event.repository.name }}
       run: |
-        cd ${GITHUB_WORKSPACE}
+        cd ${{ github.workspace }}
         mkdir ~/.ssh
         ssh-keyscan -p 2222 codeserver.dev.${PANTHEON_SITE_ID}.drush.in >> ~/.ssh/known_hosts
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/private.key
