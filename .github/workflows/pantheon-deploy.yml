@@ -77,6 +77,13 @@ jobs:
           fetch-depth: 0
           path: wp-content/themes
 
+      - name: just testing
+        run: |
+          echo "-- theme dir --"
+          ls -lah wp-content/themes
+          echo "-- this dir --"
+          ls -lah .
+
       - name: Cache bash_env.txt
         uses: actions/cache@v2
         env:
@@ -94,7 +101,17 @@ jobs:
       - name: setup-environment-vars
         run: /build-tools-ci/scripts/set-environment
 
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
       # Deploy to Pantheon
       - name: Deploy to Pantheon
         run: |
-          ./wp-content/themes/${CI_PROJECT_REPONAME}/.ci/deploy/pantheon/dev-multidev
+          echo "$SSH_PRIVATE_KEY" > ../private.key
+          chmod 600 ../private.key
+          eval `ssh-agent -s`
+          ssh-add ../private.key
+          source $BASH_ENV
+          ./.ci/deploy/pantheon/dev-multidev
