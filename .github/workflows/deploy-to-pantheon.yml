@@ -12,10 +12,11 @@ jobs:
       with:
         path: theme_workdir
 
-    - name: Set up SSH
+    - name: Build and deploy
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         PANTHEON_SITE_ID: ${{ secrets.SITE_UUID }}
+        PANTHEON_GIT_URL: ${{ secrets.PANTHEON_GIT_URL }}
       run: |
         mkdir ~/.ssh
         ssh-keyscan -p 2222 codeserver.dev.${PANTHEON_SITE_ID}.drush.in >> ~/.ssh/known_hosts
@@ -23,18 +24,10 @@ jobs:
         chmod 600 ~/.ssh/private.key
         eval `ssh-agent -s`
         ssh-add ~/.ssh/private.key
-
-    - name: Build and commit
-      env:
-        PANTHEON_GIT_URL: ${{ secrets.PANTHEON_GIT_URL }}
-      run: |
         git clone ${PANTHEON_GIT_URL} docroot
         rm -rf docroot/wp-content/themes/${{ github.repository }}
         mv theme_workdir/${{ github.repository }} docroot/wp-content/themes
         rm -rf docroot/wp-content/themes/${{ github.repository }}/.git
         git add .
         git commit . --message="Deploy from GitHub: ${{ github.ref }}"
-
-    - name: Deploy to Pantheon dev environment
-      run: |
         git push origin HEAD:master
