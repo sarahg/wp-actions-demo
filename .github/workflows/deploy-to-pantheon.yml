@@ -10,22 +10,26 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v1
       with:
-        path: theme_dir
+        path: ${GITHUB_WORKSPACE}/theme_dir
 
-    - name: Build and deploy
+    - name: Set up SSH
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         PANTHEON_SITE_ID: ${{ secrets.SITE_UUID }}
-        PANTHEON_GIT_URL: ${{ secrets.PANTHEON_GIT_URL }}
-        THEME_NAME: ${{ github.event.repository.name }}
       run: |
-        pwd
+        cd ${GITHUB_WORKSPACE}
         mkdir ~/.ssh
         ssh-keyscan -p 2222 codeserver.dev.${PANTHEON_SITE_ID}.drush.in >> ~/.ssh/known_hosts
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/private.key
         chmod 600 ~/.ssh/private.key
         eval `ssh-agent -s`
         ssh-add ~/.ssh/private.key
+
+    - name: Build and deploy
+      env:
+        PANTHEON_GIT_URL: ${{ secrets.PANTHEON_GIT_URL }}
+        THEME_NAME: ${{ github.event.repository.name }}
+      run: |
         git clone ${PANTHEON_GIT_URL} wordpress
         ls -lah
         rm -rf wordpress/wp-content/themes/${THEME_NAME}/*
