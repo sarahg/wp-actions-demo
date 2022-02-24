@@ -3,6 +3,12 @@ on:
   push:
     branches:
       - 'main'
+env:
+  SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+  PANTHEON_SITE_ID: ${{ secrets.SITE_UUID }}
+  PANTHEON_GIT_URL: ${{ secrets.PANTHEON_GIT_URL }}
+  THEME_NAME: ${{ github.event.repository.name }}
+
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
@@ -13,11 +19,6 @@ jobs:
         path: theme_dir
 
     - name: Build and deploy
-      env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        PANTHEON_SITE_ID: ${{ secrets.SITE_UUID }}
-        PANTHEON_GIT_URL: ${{ secrets.PANTHEON_GIT_URL }}
-        THEME_NAME: ${{ github.event.repository.name }}
       run: |
         cd ..
         mkdir ~/.ssh
@@ -26,9 +27,17 @@ jobs:
         chmod 600 ~/.ssh/private.key
         eval `ssh-agent -s`
         ssh-add ~/.ssh/private.key
+
+    - name: Clone and merge
+      run: |
+        pwd
         git clone ${PANTHEON_GIT_URL} wordpress
         mv ${{ github.workspace }}/* wordpress/wp-content/themes
         rm -rf wordpress/wp-content/themes/${THEME_NAME}/.git
+
+    - name: Deploy
+      run: |
+        pwd
         cd wordpress
         git config --global user.email "sarah@sarahgerman.com"
         git config --global user.name "Sarah German"
