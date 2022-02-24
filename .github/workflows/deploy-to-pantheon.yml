@@ -12,10 +12,12 @@ jobs:
       with:
         path: ${GITHUB_WORKSPACE}/theme_dir
 
-    - name: Set up SSH
+    - name: Build and deploy
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         PANTHEON_SITE_ID: ${{ secrets.SITE_UUID }}
+        PANTHEON_GIT_URL: ${{ secrets.PANTHEON_GIT_URL }}
+        THEME_NAME: ${{ github.event.repository.name }}
       run: |
         cd ${GITHUB_WORKSPACE}
         mkdir ~/.ssh
@@ -24,12 +26,6 @@ jobs:
         chmod 600 ~/.ssh/private.key
         eval `ssh-agent -s`
         ssh-add ~/.ssh/private.key
-
-    - name: Build and deploy
-      env:
-        PANTHEON_GIT_URL: ${{ secrets.PANTHEON_GIT_URL }}
-        THEME_NAME: ${{ github.event.repository.name }}
-      run: |
         git clone ${PANTHEON_GIT_URL} wordpress
         ls -lah
         rm -rf wordpress/wp-content/themes/${THEME_NAME}/*
