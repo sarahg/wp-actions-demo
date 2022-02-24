@@ -17,8 +17,8 @@ jobs:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         PANTHEON_SITE_ID: ${{ secrets.SITE_UUID }}
         PANTHEON_GIT_URL: ${{ secrets.PANTHEON_GIT_URL }}
+        THEME_NAME: ${{ github.event.repository.name }}
       run: |
-        echo ::set-env name=THEME_NAME::${{ github.event.repository.name }}
         mkdir ~/.ssh
         ssh-keyscan -p 2222 codeserver.dev.${PANTHEON_SITE_ID}.drush.in >> ~/.ssh/known_hosts
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/private.key
