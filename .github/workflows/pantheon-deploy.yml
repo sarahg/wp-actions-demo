@@ -9,14 +9,11 @@ env:
   GITHUB_TOKEN: ${{ github.token }}
   TERMINUS_TOKEN: ${{ secrets.TERMINUS_TOKEN }}
   TEST_SITE_NAME: ${{ secrets.TERMINUS_SITE }}
-  SITE_UUID: ${{ secrets.SITE_UUID }}
-  PANTHEON_GIT_URL: ${{ secrets.PANTHEON_GIT_URL }}
   BASH_ENV: "./bash_env.txt"
   CI_BRANCH: ${{ github.ref }}
   COMMIT_SHA: ${{ github.sha }}
   CI_BUILD_NUMBER: ${{ github.run_number }}
   DEFAULT_SITE: ${{ secrets.TERMINUS_SITE }}
-  SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
   GITHUB_OWNER: ${{ github.repository_owner }}
   CI_PROJECT_NAME: ${{ github.repository }}
 
@@ -27,9 +24,6 @@ jobs:
       options: --user root
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
       - name: Cache bash_env.txt
         uses: actions/cache@v2
         env:
@@ -103,4 +97,4 @@ jobs:
       # Deploy to Pantheon
       - name: Deploy to Pantheon
         run: |
-          ./.ci/deploy/pantheon/dev-multidev
+          ./wp-content/themes/${CI_PROJECT_NAME}/.ci/deploy/pantheon/dev-multidev
