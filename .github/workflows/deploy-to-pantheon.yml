@@ -37,17 +37,18 @@ jobs:
         cd ..
         git clone ${PANTHEON_GIT_URL} wordpress
         mv ${{ github.workspace }}/* wordpress/wp-content/themes/${THEME_NAME}
-        rm -rf wordpress/wp-content/themes/${THEME_NAME}/.git
 
     - name: Deploy
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       run: |
         cd ../wordpress
+        COMMIT_MSG=$(git log -1 --pretty=%B)
+        rm -rf wp-content/themes/${THEME_NAME}/.git
         git config --global user.email "sarah@sarahgerman.com"
         git config --global user.name "Sarah German"
         git add .
-        git commit . --message="Deploy from GitHub: ${{ github.ref }}"
+        git commit . --message="Deploy from GitHub: ${COMMIT_MSG}"
         git push origin HEAD:master
 
     - name: Cleanup
