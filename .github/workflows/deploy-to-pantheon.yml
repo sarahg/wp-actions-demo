@@ -8,18 +8,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - uses: shimataro/ssh-key-action@v2
-      with:
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        config:
-          Host *.drush.in
-            StrictHostKeyChecking no
-            HostkeyAlgorithms +ssh-rsa
-            PubkeyAcceptedAlgorithms +ssh-rsa
-        known_hosts: unnecessary
+
     - name: deployer
       env:
-        pantheon_repo: '${{ secrets.PANTHEON_GIT_URL }}'
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        PANTHEON_GIT_URL: '${{ secrets.PANTHEON_GIT_URL }}'
+        PANTHEON_SITE_ID: '${{ secrets.SITE_UUID }}'
       run: |
-        git remote add pantheon $pantheon_repo
+        echo "$SSH_PRIVATE_KEY" > ../private.key
+        ssh-keyscan -p 2222 codeserver.dev.${PANTHEON_SITE_ID}.drush.in >> ~/.ssh/known_hosts
+        chmod 600 ../private.key
+        eval `ssh-agent -s`
+        ssh-add ../private.key
+        git remote add pantheon $PANTHEON_GIT_URL
         git push pantheon HEAD:master
