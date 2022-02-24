@@ -16,6 +16,7 @@ env:
   DEFAULT_SITE: ${{ secrets.TERMINUS_SITE }}
   GITHUB_OWNER: ${{ github.repository_owner }}
   CI_PROJECT_NAME: ${{ github.repository }}
+  SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
 jobs:
   configure_env_vars:
