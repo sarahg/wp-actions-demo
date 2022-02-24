@@ -14,8 +14,9 @@ jobs:
         config:
           Host *.drush.in
             StrictHostKeyChecking no
-        known_hosts:
-          ssh-keyscan -p 2222 codeserver.dev.d59882c1-ed01-4646-a63e-16b6f9cfa5d3.drush.in
+            HostkeyAlgorithms +ssh-rsa
+            PubkeyAcceptedAlgorithms +ssh-rsa
+        known_hosts: unnecessary
     - name: deployer
       env:
         pantheon_repo: '${{ secrets.PANTHEON_GIT_URL }}'
