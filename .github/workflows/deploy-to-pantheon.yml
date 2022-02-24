@@ -4,22 +4,35 @@ on:
     branches:
       - 'main'
 jobs:
-  build:
+  build_and_deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - name: Checkout
+      uses: actions/checkout@v1
+      with:
+        path: theme_workdir
 
-    - name: deployer
+    - name: Set up SSH
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        PANTHEON_GIT_URL: '${{ secrets.PANTHEON_GIT_URL }}'
-        PANTHEON_SITE_ID: '${{ secrets.SITE_UUID }}'
+        PANTHEON_SITE_ID: ${{ secrets.SITE_UUID }}
       run: |
         mkdir ~/.ssh
-        echo "$SSH_PRIVATE_KEY" > ~/.ssh/private.key
         ssh-keyscan -p 2222 codeserver.dev.${PANTHEON_SITE_ID}.drush.in >> ~/.ssh/known_hosts
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/private.key
         chmod 600 ~/.ssh/private.key
         eval `ssh-agent -s`
         ssh-add ~/.ssh/private.key
-        git remote add pantheon $PANTHEON_GIT_URL
-        git push pantheon HEAD:master
+
+    - name: Build and commit
+      run: |
+        git clone ${PANTHEON_GIT_URL} docroot
+        rm -rf docroot/wp-content/themes/${{ github.repository }}
+        mv theme_workdir/${{ github.repository }} docroot/wp-content/themes
+        rm -rf docroot/wp-content/themes/${{ github.repository }}/.git
+        git add .
+        git commit . --message="Deploy from GitHub: ${{ github.ref }}"
+
+    - name: Deploy to Pantheon dev environment
+      run: |
+        git push origin HEAD:master
