@@ -38,13 +38,7 @@ jobs:
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       run: |
-        COMMIT_MSG=$(git log -1 --pretty=%B)
-        cd wordpress
-        git config --global user.email "${GIT_EMAIL}"
-        git config --global user.name "GitHub Actions"
-        git add */.*
-        git commit . --message="Deploy from GitHub: ${COMMIT_MSG}"
-        git push origin HEAD:master
+        ./.ci/commit-push
 
     - name: Cleanup
       if: always()
