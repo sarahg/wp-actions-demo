@@ -10,7 +10,7 @@ git config --global user.name "GitHub Actions"
 
 STATUS=$(git status --porcelain)
 
-if f [ -n "$STATUS" ]; then
+if [ -n "$STATUS" ]; then
     git add *
     git commit . --message="Deploy from GitHub: ${COMMIT_MSG}"
     git push origin HEAD:master
