@@ -46,6 +46,7 @@ jobs:
         COMMIT_MSG=$(git log -1 --pretty=%B)
         cd ../wordpress
         rm -rf wp-content/themes/${THEME_NAME}/.git
+        git status
         git config --global user.email "${GIT_EMAIL}"
         git config --global user.name "GitHub Actions"
         git add */.*
