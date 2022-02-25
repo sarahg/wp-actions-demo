@@ -16,14 +16,11 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v1
-      with:
-        path: theme_dir
 
     - name: Set Up SSH
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       run: |
-        cd ..
         mkdir ~/.ssh
         ssh-keyscan -p 2222 codeserver.dev.${PANTHEON_SITE_ID}.drush.in >> ~/.ssh/known_hosts
         ssh-agent -a $SSH_AUTH_SOCK > /dev/null
@@ -35,9 +32,8 @@ jobs:
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       run: |
-        cd ..
         git clone ${PANTHEON_GIT_URL} wordpress
-        mv ${{ github.workspace }}/* wordpress/wp-content/themes
+        mv {.[!.],}* wordpress/wp-content/themes/${THEME_NAME}
         ls -lah wordpress/wp-content/themes
 
     - name: Commit Theme and Deploy
@@ -45,7 +41,7 @@ jobs:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       run: |
         COMMIT_MSG=$(git log -1 --pretty=%B)
-        cd ../wordpress
+        cd wordpress
         rm -rf wp-content/themes/${THEME_NAME}/.git
         git status
         git config --global user.email "${GIT_EMAIL}"
