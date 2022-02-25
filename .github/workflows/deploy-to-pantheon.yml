@@ -38,6 +38,7 @@ jobs:
         cd ..
         git clone ${PANTHEON_GIT_URL} wordpress
         mv ${{ github.workspace }}/* wordpress/wp-content/themes
+        ls -lah wordpress/wp-content/themes
 
     - name: Commit Theme and Deploy
       env:
