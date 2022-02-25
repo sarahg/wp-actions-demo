@@ -32,11 +32,13 @@ jobs:
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       run: |
+        shopt -s extglob nullglob
         git clone ${PANTHEON_GIT_URL} wordpress
-        rm -rf wordpress/wp-content/themes/${THEME_NAME}
-        mkdir wordpress/wp-content/themes/${THEME_NAME}
-        mv {.[!.],}* wordpress/wp-content/themes/${THEME_NAME}
+        rm -rf wordpress/wp-content/themes/${THEME_NAME}/*
+        mv ./!(wordpress) wordpress/wp-content/themes/${THEME_NAME}
         ls -lah wordpress/wp-content/themes
+      shell:
+        bash
 
     - name: Commit Theme and Deploy
       env:
