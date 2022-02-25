@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -eou pipefail
+
+mkdir ~/.ssh
+ssh-keyscan -p 2222 codeserver.dev.${PANTHEON_SITE_ID}.drush.in >> ~/.ssh/known_hosts
+ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+echo "$SSH_PRIVATE_KEY" > ~/.ssh/private.key
+chmod 600 ~/.ssh/private.key
+ssh-add ~/.ssh/private.key

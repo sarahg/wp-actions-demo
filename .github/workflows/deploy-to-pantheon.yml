@@ -15,18 +15,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
 
     - name: Set Up SSH
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       run: |
-        mkdir ~/.ssh
-        ssh-keyscan -p 2222 codeserver.dev.${PANTHEON_SITE_ID}.drush.in >> ~/.ssh/known_hosts
-        ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-        echo "$SSH_PRIVATE_KEY" > ~/.ssh/private.key
-        chmod 600 ~/.ssh/private.key
-        ssh-add ~/.ssh/private.key
+        ./.ci/pantheon-ssh
 
     - name: Clone Pantheon WordPress and Replace the Theme
       env:
@@ -36,7 +31,6 @@ jobs:
         git clone ${PANTHEON_GIT_URL} wordpress
         rm -rf wordpress/wp-content/themes/${THEME_NAME}/*
         mv ./!(wordpress) wordpress/wp-content/themes/${THEME_NAME}
-        ls -lah wordpress/wp-content/themes
       shell:
         bash
 
@@ -46,8 +40,6 @@ jobs:
       run: |
         COMMIT_MSG=$(git log -1 --pretty=%B)
         cd wordpress
-        rm -rf wp-content/themes/${THEME_NAME}/.git
-        git status
         git config --global user.email "${GIT_EMAIL}"
         git config --global user.name "GitHub Actions"
         git add */.*
