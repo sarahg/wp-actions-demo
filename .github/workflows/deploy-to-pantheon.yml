@@ -28,11 +28,13 @@ jobs:
         chmod 600 ~/.ssh/private.key
         ssh-add ~/.ssh/private.key
 
-    - name: Clone Pantheon WordPress
+    - name: Clone Pantheon WordPress and Replace the Theme
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       run: |
         git clone ${PANTHEON_GIT_URL} wordpress
+        rm -rf wordpress/wp-content/themes/${THEME_NAME}
+        mkdir wordpress/wp-content/themes/${THEME_NAME}
         mv {.[!.],}* wordpress/wp-content/themes/${THEME_NAME}
         ls -lah wordpress/wp-content/themes
 
