@@ -7,6 +7,7 @@ env:
   SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
   PANTHEON_SITE_ID: ${{ secrets.SITE_UUID }}
   PANTHEON_GIT_URL: ${{ secrets.PANTHEON_GIT_URL }}
+  GIT_EMAIL: ${{ secrets.GIT_EMAIL }}
   THEME_NAME: ${{ github.event.repository.name }}
 
 jobs:
@@ -18,7 +19,7 @@ jobs:
       with:
         path: theme_dir
 
-    - name: Set up SSH
+    - name: Set Up SSH
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       run: |
@@ -30,7 +31,7 @@ jobs:
         chmod 600 ~/.ssh/private.key
         ssh-add ~/.ssh/private.key
 
-    - name: Clone and merge
+    - name: Clone Pantheon WordPress
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       run: |
@@ -38,15 +39,15 @@ jobs:
         git clone ${PANTHEON_GIT_URL} wordpress
         mv ${{ github.workspace }}/* wordpress/wp-content/themes
 
-    - name: Deploy
+    - name: Commit Theme and Deploy
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       run: |
         COMMIT_MSG=$(git log -1 --pretty=%B)
         cd ../wordpress
         rm -rf wp-content/themes/${THEME_NAME}/.git
-        git config --global user.email "sarah@sarahgerman.com"
-        git config --global user.name "Sarah German"
+        git config --global user.email "${GIT_EMAIL}"
+        git config --global user.name "GitHub Actions"
         git add */.*
         git commit . --message="Deploy from GitHub: ${COMMIT_MSG}"
         git push origin HEAD:master
