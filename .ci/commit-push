@@ -8,8 +8,10 @@ cd wordpress
 git config --global user.email "${GIT_EMAIL}"
 git config --global user.name "GitHub Actions"
 
-STATUS=$(git status --porcelain)
+# @todo create a multidev if applicable (e.g pr-3)
+# @todo delete multidev when PR is merged?
 
+STATUS=$(git status --porcelain)
 if [ -n "$STATUS" ]; then
     git add *
     git commit . --message="Deploy from GitHub: ${COMMIT_MSG}"
