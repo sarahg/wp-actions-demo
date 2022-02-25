@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -eou pipefail
+shopt -s extglob nullglob
+
+# @todo clone diff branch if there's a pr-x branch on pantheon?
+git clone ${PANTHEON_GIT_URL} wordpress
+
+# Replace the theme directory with this one.
+rm -rf wordpress/wp-content/themes/${THEME_NAME}/*
+mv ./!(wordpress) wordpress/wp-content/themes/${THEME_NAME}
