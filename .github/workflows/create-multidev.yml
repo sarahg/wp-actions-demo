@@ -1,0 +1,22 @@
+name: Create PR Multidev
+
+on: [pull_request]
+env:
+  PANTHEON_SITE_ID: ${{ secrets.SITE_UUID }}
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.4'
+
+    - name: Install Terminus
+      uses: ackama/setup-terminus@main
+      with:
+        pantheon-machine-token: ${{ secrets.TERMINUS_TOKEN }}
+
+    - name: Create Multidev
+      run: |
+        terminus multidev:create $PANTHEON_SITE_ID.live
