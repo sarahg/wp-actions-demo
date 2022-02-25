@@ -8,3 +8,7 @@
  * Tags:
  * Text Domain: gh-actions-demo-theme
  */
+
+ body {
+     color: red;
+ }
