@@ -25,7 +25,7 @@ jobs:
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       run: |
-        ./ci/build-theme
+        ./.ci/build-theme
 
     - name: Commit Theme and Deploy
       env:
