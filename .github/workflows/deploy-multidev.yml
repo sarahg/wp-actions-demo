@@ -13,50 +13,49 @@ env:
 jobs:
   create_multidev:
     runs-on: ubuntu-latest
-    if: ${{ github.event.action == 'opened' }}
     steps:
       - name: Setup PHP
+        if: ${{ github.event.action == 'opened' }}
         uses: shivammathur/setup-php@v2
         with:
           php-version: '7.4'
 
       - name: Install Terminus
+        if: ${{ github.event.action == 'opened' }}
         uses: ackama/setup-terminus@main
         with:
           pantheon-machine-token: ${{ secrets.TERMINUS_TOKEN }}
 
       - name: Create Multidev
+        if: ${{ github.event.action == 'opened' }}
         run: |
           terminus multidev:create $PANTHEON_SITE_ID.dev pr-$PR_NUMBER
 
-  build_and_deploy:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
-    - name: Set Up SSH
-      env:
-        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-      run: |
-        ./.ci/pantheon-ssh
+      - name: Set Up SSH
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          ./.ci/pantheon-ssh
 
-    - name: Clone Pantheon WordPress and Replace the Theme
-      env:
-        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-      run: |
-        ./.ci/build-theme pr-$PR_NUMBER
+      - name: Clone Pantheon WordPress and Replace the Theme
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          ./.ci/build-theme pr-$PR_NUMBER
 
-    - name: Commit Theme and Deploy
-      env:
-        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-      run: |
-        ./.ci/commit-push pr-$PR_NUMBER
+      - name: Commit Theme and Deploy
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          ./.ci/commit-push pr-$PR_NUMBER
 
-    - name: Cleanup
-      if: always()
-      env:
-        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-      run: |
-        ssh-add -D
-        rm -Rf *
+      - name: Cleanup
+        if: always()
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          ssh-add -D
+          rm -Rf *
