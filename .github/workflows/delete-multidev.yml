@@ -3,6 +3,8 @@ name: Cleanup Multidevs
 on:
   pull_request:
     types: [ closed ]
+env:
+  PANTHEON_SITE_ID: ${{ secrets.SITE_UUID }}
 
 jobs:
   pantheon_cleanup:

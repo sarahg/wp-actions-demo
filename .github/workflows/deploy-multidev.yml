@@ -27,7 +27,7 @@ jobs:
     - name: Create Multidev for new PRs
       if: ${{ github.event.action == 'opened' }}
       run: |
-        terminus multidev:create $PANTHEON_SITE_ID.live pr-$PR_NUMBER
+        terminus multidev:create $PANTHEON_SITE_ID.dev pr-$PR_NUMBER
 
     - name: Set Up SSH
       env:
