@@ -10,6 +10,7 @@ env:
   GIT_EMAIL: ${{ secrets.GIT_EMAIL }}
   THEME_NAME: ${{ github.event.repository.name }}
   PANTHEON_DEFAULT_BRANCH: "master"
+  COMMIT_MSG: ${{ github.event.commits[0].message }}
 
 jobs:
   build_and_deploy:
