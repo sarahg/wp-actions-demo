@@ -9,7 +9,7 @@ env:
   GIT_EMAIL: ${{ secrets.GIT_EMAIL }}
   THEME_NAME: ${{ github.event.repository.name }}
   PR_NUMBER: ${{ github.event.number }}
-  
+
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
