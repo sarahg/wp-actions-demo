@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: setup_multidev
     env:
-      COMMIT_MSG: ${{ github.event.commits[0].message }}
+      COMMIT_MSG: ${{ github.event.head_commit.message }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -55,6 +55,7 @@ jobs:
       - name: Commit Theme and Deploy
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+          COMMIT_MSG: ${{ env.commitmsg }}
         run: |
           ./.ci/commit-push pr-$PR_NUMBER
 
