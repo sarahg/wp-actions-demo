@@ -11,46 +11,55 @@ env:
   PR_NUMBER: ${{ github.event.number }}
 
 jobs:
-  build_and_deploy:
+  setup_multidev:
     runs-on: ubuntu-latest
     steps:
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '7.4'
+      - name: Setup PHP
+        if: ${{ github.event.action == 'opened' }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
 
-    - name: Install Terminus
-      uses: ackama/setup-terminus@main
-      with:
-        pantheon-machine-token: ${{ secrets.TERMINUS_TOKEN }}
+      - name: Install Terminus
+        if: ${{ github.event.action == 'opened' }}
+        uses: ackama/setup-terminus@main
+        with:
+          pantheon-machine-token: ${{ secrets.TERMINUS_TOKEN }}
 
-    - name: Create Multidev for new PRs
-      if: ${{ github.event.action == 'opened' }}
-      run: |
-        terminus multidev:create $PANTHEON_SITE_ID.live pr-$PR_NUMBER
+      - name: Create Multidev
+        if: ${{ github.event.action == 'opened' }}
+        run: |
+          terminus multidev:create $PANTHEON_SITE_ID.dev pr-$PR_NUMBER
 
-    - name: Set Up SSH
-      env:
-        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-      run: |
-        ./.ci/pantheon-ssh
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    needs: setup_multidev
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
 
-    - name: Clone Pantheon WordPress and Replace the Theme
-      env:
-        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-      run: |
-        ./.ci/build-theme pr-$PR_NUMBER
+      - name: Set Up SSH
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          ./.ci/pantheon-ssh
 
-    - name: Commit Theme and Deploy
-      env:
-        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-      run: |
-        ./.ci/commit-push pr-$PR_NUMBER
+      - name: Clone Pantheon WordPress and Replace the Theme
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          ./.ci/build-theme pr-$PR_NUMBER
 
-    - name: Cleanup
-      if: always()
-      env:
-        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-      run: |
-        ssh-add -D
-        rm -Rf *
+      - name: Commit Theme and Deploy
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          ./.ci/commit-push pr-$PR_NUMBER
+
+      - name: Cleanup
+        if: always()
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          ssh-add -D
+          rm -Rf *

@@ -4,16 +4,20 @@ set -eou pipefail
 
 BRANCH=${1}
 
+# Get the last commit message from the GitHub repo checkout.
 COMMIT_MSG=$(git log -1 --pretty=%B)
+
+# Move into the directory we're deploying to Pantheon.
 cd wordpress
 
+# Set up Git.
 git config --global user.email "${GIT_EMAIL}"
 git config --global user.name "GitHub Actions"
 
+# If we have changes, push them to Pantheon.
 STATUS=$(git status --porcelain)
 if [ -n "$STATUS" ]; then
     git add "*"
     git commit . --message="Deploy from GitHub: ${COMMIT_MSG}"
-
     git push origin HEAD:"$BRANCH"
 fi
