@@ -2,9 +2,15 @@
 
 set -eou pipefail
 
+# Add our private key to the SSH agent.
+# Utilizing SSH_AUTH_SOCK allows us to share the SSH agent with the host machine
+# and reuse this key across multiple CI jobs.
+# https://www.jamesridgway.co.uk/sharing-an-ssh-agent-between-a-host-machine-and-a-docker-container/
 mkdir ~/.ssh
-ssh-keyscan -p 2222 codeserver.dev.${PANTHEON_SITE_ID}.drush.in >> ~/.ssh/known_hosts
 ssh-agent -a $SSH_AUTH_SOCK > /dev/null
 echo "$SSH_PRIVATE_KEY" > ~/.ssh/private.key
 chmod 600 ~/.ssh/private.key
 ssh-add ~/.ssh/private.key
+
+# Set up known_hosts by pulling public keys from Pantheon's codeserver.
+ssh-keyscan -p 2222 codeserver.dev.${PANTHEON_SITE_ID}.drush.in >> ~/.ssh/known_hosts

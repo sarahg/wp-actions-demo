@@ -1,6 +1,9 @@
-name: Create PR Multidev
+name: Multidevs for PRs
 
-on: [pull_request]
+on:
+  pull_request:
+    types: [opened]
+
 env:
   PANTHEON_SITE_ID: ${{ secrets.SITE_UUID }}
   PR_NUMBER: ${{ github.event.number }}
@@ -20,4 +23,30 @@ jobs:
 
     - name: Create Multidev
       run: |
-        terminus multidev:create $PANTHEON_SITE_ID.live $PR_NUMBER
+        terminus multidev:create $PANTHEON_SITE_ID.live pr-$PR_NUMBER
+
+    - name: Set Up SSH
+      env:
+        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+      run: |
+        ./.ci/pantheon-ssh
+
+    - name: Clone Pantheon WordPress and Replace the Theme
+      env:
+        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+      run: |
+        ./.ci/build-theme pr-$PR_NUMBER
+
+    - name: Commit Theme and Deploy
+      env:
+        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+      run: |
+        ./.ci/commit-push pr-$PR_NUMBER
+
+    - name: Cleanup
+      if: always()
+      env:
+        SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+      run: |
+        ssh-add -D
+        rm -Rf *

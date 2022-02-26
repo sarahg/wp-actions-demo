@@ -3,9 +3,9 @@
 set -eou pipefail
 shopt -s extglob nullglob
 
-# @todo clone diff branch if there's a pr-x branch on pantheon?
-# @todo we can create git URL using the site ID
-git clone ${PANTHEON_GIT_URL} wordpress
+BRANCH=${1}
+
+git clone --branch $BRANCH ${PANTHEON_GIT_URL} wordpress
 
 # Replace the theme directory with this one.
 rm -rf wordpress/wp-content/themes/${THEME_NAME}/*
