@@ -11,23 +11,29 @@ env:
   PR_NUMBER: ${{ github.event.number }}
 
 jobs:
+  create_multidev:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.action == 'opened' }}
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+
+      - name: Install Terminus
+        uses: ackama/setup-terminus@main
+        with:
+          pantheon-machine-token: ${{ secrets.TERMINUS_TOKEN }}
+
+      - name: Create Multidev
+        run: |
+          terminus multidev:create $PANTHEON_SITE_ID.dev pr-$PR_NUMBER
+
   build_and_deploy:
     runs-on: ubuntu-latest
     steps:
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '7.4'
-
-    - name: Install Terminus
-      uses: ackama/setup-terminus@main
-      with:
-        pantheon-machine-token: ${{ secrets.TERMINUS_TOKEN }}
-
-    - name: Create Multidev for new PRs
-      if: ${{ github.event.action == 'opened' }}
-      run: |
-        terminus multidev:create $PANTHEON_SITE_ID.dev pr-$PR_NUMBER
+    - name: Checkout
+      uses: actions/checkout@v2
 
     - name: Set Up SSH
       env:
