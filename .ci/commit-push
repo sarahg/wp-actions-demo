@@ -12,8 +12,8 @@ git config --global user.name "GitHub Actions"
 
 STATUS=$(git status --porcelain)
 if [ -n "$STATUS" ]; then
-    git add *
+    git add "*"
     git commit . --message="Deploy from GitHub: ${COMMIT_MSG}"
 
-    git push origin HEAD:$BRANCH
+    git push origin HEAD:"$BRANCH"
 fi

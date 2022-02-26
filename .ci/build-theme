@@ -5,8 +5,8 @@ shopt -s extglob nullglob
 
 BRANCH=${1}
 
-git clone --branch $BRANCH ${PANTHEON_GIT_URL} wordpress
+git clone --branch "$BRANCH" ssh://codeserver.dev."$PANTHEON_SITE_ID"@codeserver.dev."$PANTHEON_SITE_ID".drush.in:2222/~/repository.git wordpress
 
 # Replace the theme directory with this one.
-rm -rf wordpress/wp-content/themes/${THEME_NAME}/*
-mv ./!(wordpress) wordpress/wp-content/themes/${THEME_NAME}
+rm -rf wordpress/wp-content/themes/"${THEME_NAME}"/*
+mv ./!(wordpress) wordpress/wp-content/themes/"${THEME_NAME}"

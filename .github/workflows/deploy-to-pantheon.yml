@@ -4,7 +4,6 @@ on: [push]
 env:
   SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
   PANTHEON_SITE_ID: ${{ secrets.SITE_UUID }}
-  PANTHEON_GIT_URL: "ssh://codeserver.dev.${PANTHEON_SITE_ID}@codeserver.dev.${PANTHEON_SITE_ID}.drush.in:2222/~/repository.git"
   GIT_EMAIL: ${{ secrets.GIT_EMAIL }}
   THEME_NAME: ${{ github.event.repository.name }}
 
