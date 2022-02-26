@@ -55,7 +55,6 @@ jobs:
       - name: Commit Theme and Deploy
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-          COMMIT_MSG: ${{ env.commitmsg }}
         run: |
           ./.ci/commit-push pr-$PR_NUMBER
 
