@@ -2,8 +2,7 @@ name: Multidevs for PRs
 
 on:
   pull_request:
-    types: [opened]
-
+    types: [opened, synchronize]
 env:
   PANTHEON_SITE_ID: ${{ secrets.SITE_UUID }}
   PR_NUMBER: ${{ github.event.number }}
@@ -21,7 +20,8 @@ jobs:
       with:
         pantheon-machine-token: ${{ secrets.TERMINUS_TOKEN }}
 
-    - name: Create Multidev
+    - name: Create Multidev for new PRs
+      if: ${{ github.event.action == 'opened' }}
       run: |
         terminus multidev:create $PANTHEON_SITE_ID.live pr-$PR_NUMBER
 

@@ -1,11 +1,15 @@
 name: Deploy to Pantheon
 
-on: [push]
+on:
+  push:
+    branches:
+      - 'main'
 env:
   SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
   PANTHEON_SITE_ID: ${{ secrets.SITE_UUID }}
   GIT_EMAIL: ${{ secrets.GIT_EMAIL }}
   THEME_NAME: ${{ github.event.repository.name }}
+  PANTHEON_DEFAULT_BRANCH: "master"
 
 jobs:
   build_and_deploy:
@@ -13,6 +17,10 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+
+    - name: Get branch name
+      id: branch-name
+      uses: tj-actions/branch-names@v5.1
 
     - name: Set Up SSH
       env:
@@ -24,13 +32,13 @@ jobs:
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       run: |
-        ./.ci/build-theme master
+        ./.ci/build-theme $PANTHEON_DEFAULT_BRANCH
 
     - name: Commit Theme and Deploy
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
       run: |
-        ./.ci/commit-push master
+        ./.ci/commit-push $PANTHEON_DEFAULT_BRANCH
 
     - name: Cleanup
       if: always()
