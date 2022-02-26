@@ -1,8 +1,8 @@
-name: Manage Multidevs
+name: Delete Multidevs
 
 on:
   pull_request:
-    types: [ opened, closed ]
+    types: [ closed ]
 env:
   PANTHEON_SITE_ID: ${{ secrets.SITE_UUID }}
   PR_NUMBER: ${{ github.event.number }}
@@ -21,11 +21,6 @@ jobs:
         uses: ackama/setup-terminus@main
         with:
           pantheon-machine-token: ${{ secrets.TERMINUS_TOKEN }}
-
-      - name: Create Multidev
-        if: ${{ github.event.action == 'opened' }}
-        run: |
-          terminus multidev:create $PANTHEON_SITE_ID.dev pr-$PR_NUMBER
 
       - name: Delete Multidev
         if: ${{ github.event.action == 'closed' }}
