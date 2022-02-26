@@ -18,10 +18,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Get branch name
-      id: branch-name
-      uses: tj-actions/branch-names@v5.1
-
     - name: Set Up SSH
       env:
         SSH_AUTH_SOCK: /tmp/ssh_agent.sock
