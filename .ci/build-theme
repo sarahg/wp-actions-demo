@@ -3,10 +3,10 @@
 set -eou pipefail
 shopt -s extglob nullglob
 
+# Clone the Pantheon repo into the build environment.
 BRANCH=${1}
-
 git clone --branch "$BRANCH" ssh://codeserver.dev."$PANTHEON_SITE_ID"@codeserver.dev."$PANTHEON_SITE_ID".drush.in:2222/~/repository.git wordpress
 
-# Replace the theme directory with this one.
+# Replace the theme directory in the Pantheon checkout with our GitHub theme code.
 rm -rf wordpress/wp-content/themes/"${THEME_NAME}"/*
 mv ./!(wordpress) wordpress/wp-content/themes/"${THEME_NAME}"
