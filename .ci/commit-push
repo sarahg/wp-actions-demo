@@ -5,6 +5,7 @@ set -eou pipefail
 BRANCH=${1}
 
 # Get the last commit message from the GitHub repo checkout.
+# @todo this looks wrong on PR branches
 COMMIT_MSG=$(git log -1 --pretty=%B)
 
 # Move into the directory we're deploying to Pantheon.
