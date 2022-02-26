@@ -19,5 +19,7 @@ jobs:
         pantheon-machine-token: ${{ secrets.TERMINUS_TOKEN }}
 
     - name: Delete Multidev
+      env:
+        PANTHEON_SITE_ID: ${{ secrets.SITE_UUID }}
       run: |
         terminus multidev:delete $PANTHEON_SITE_ID.pr-${{ github.event.number }}
