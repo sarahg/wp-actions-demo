@@ -1,0 +1,33 @@
+name: Manage Multidevs
+
+on:
+  pull_request:
+    types: [ opened, closed ]
+env:
+  PANTHEON_SITE_ID: ${{ secrets.SITE_UUID }}
+  PR_NUMBER: ${{ github.event.number }}
+
+jobs:
+  manage_multidevs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+
+      - name: Install Terminus
+        uses: ackama/setup-terminus@main
+        with:
+          pantheon-machine-token: ${{ secrets.TERMINUS_TOKEN }}
+
+      - name: Create Multidev
+        if: ${{ github.event.action == 'opened' }}
+        run: |
+          terminus multidev:create $PANTHEON_SITE_ID.dev pr-$PR_NUMBER
+
+      - name: Delete Multidev
+        if: ${{ github.event.action == 'closed' }}
+        run: |
+          terminus multidev:delete $PANTHEON_SITE_ID.pr-${{ github.event.number }}
