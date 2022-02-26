@@ -30,4 +30,4 @@ jobs:
       - name: Delete Multidev
         if: ${{ github.event.action == 'closed' }}
         run: |
-          terminus multidev:delete $PANTHEON_SITE_ID.pr-${{ github.event.number }}
+          terminus multidev:delete $PANTHEON_SITE_ID.pr-${{ github.event.number }} -y
