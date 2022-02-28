@@ -39,12 +39,12 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-          ref: ${{github.event.after}}
+          ref: ${{ github.event.after }}
 
       - name: Get Commit Message
         run: |
-          MSG=$(git log --format=%B -n 1 ${{github.event.after}})
-          echo "::set-env name=COMMIT_MSG::${MSG}"
+          MSG=$(git log --format=%B -n 1 ${{ github.event.after }})
+          echo "COMMIT_MSG=${MSG}" >> $GITHUB_ENV
 
       - name: Set Up SSH
         env:
@@ -61,6 +61,7 @@ jobs:
       - name: Commit Theme and Deploy
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+          COMMIT_MSG: ${{ env.COMMIT_MSG }}
         run: |
           ./.ci/commit-push pr-$PR_NUMBER
 
